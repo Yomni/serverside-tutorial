@@ -35,15 +35,18 @@ const createTodo = (req, res, next) => {
     res.sendStatus(400);
     return;
   }
-  const insertStmt = 'INSERT INTO todos (task) VALUES (?)';
-  const selectStmt = 'SELECT * FROM todos WHERE id = (?)';
+  let insertStmt = 'INSERT INTO todos (task) VALUES (?)';
+  let selectStmt = 'SELECT * FROM todos WHERE id = (?)';
+  insertStmt = mysql.format(insertStmt, [task]);
   pool.getConnection((err, connection) => {
     err && handleError(err);
-    connection.query(insertStmt, [task], (err, result) => {
+    connection.query(insertStmt, (err, result) => {
       err && handleError(err);
       logger.info(insertStmt, task);
       const { insertId } = result;
-      connection.query(selectStmt, [insertId], (err, result) => {
+      // 생성된 ID를 받아옴
+      selectStmt = mysql.format(selectStmt, [insertId]);
+      connection.query(selectStmt, (err, result) => {
         err && handleError(err);
         logger.info(selectStmt, insertId);
         res.status(200).json(result);
@@ -62,7 +65,7 @@ const updateTodo = (req, res, next) => {
   }
   const setValues = Object.keys(data).map(key => `${key} = "${data[key]}"`);
   const updateStmt = toSet => `UPDATE todos SET ${toSet} WHERE id = ?`;
-  const selectStmt = 'SELECT * FROM todos WHERE id = (?)';
+  const selectStmt = mysql.format('SELECT * FROM todos WHERE id = (?)', [id]);
   pool.getConnection((err, connection) => {
     err && handleError(err);
     connection.query(updateStmt(setValues), [id], (err, result) => {
@@ -73,7 +76,7 @@ const updateTodo = (req, res, next) => {
         logger.error(`id: ${id} not exists to update`);
         return;
       }
-      connection.query(selectStmt, [id], (err, result) => {
+      connection.query(selectStmt, (err, result) => {
         logger.info(selectStmt, id);
         res.status(200).json(result);
         connection.release();
@@ -89,10 +92,10 @@ const deleteTodo = (req, res, next) => {
     res.sendStatus(400);
     return;
   }
-  const deleteStmt = 'DELETE FROM todos WHERE id = ?';
+  const deleteStmt = mysql.format('DELETE FROM todos WHERE id = ?', [id]);
   pool.getConnection((err, connection) => {
     err && handleError(err);
-    connection.query(deleteStmt, [id], (err, result) => {
+    connection.query(deleteStmt, (err, result) => {
       const { affectedRows } = result;
       if (affectedRows) {
         res.sendStatus(200);
