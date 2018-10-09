@@ -1,0 +1,19 @@
+{
+  "name": "serverside-tutorial",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/DoonDoony/serverside-tutorial.git",
+  "author": "Doondoony <cream.doondoon@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.4",
+    "dotenv": "^6.1.0",
+    "express": "^4.16.3",
+    "mysql": "^2.16.0",
+    "nodemon": "^1.18.4",
+    "pm2": "^3.2.2",
+    "winston": "^3.1.0",
+    "winston-daily-rotate-file": "^3.3.3"
+  }
+}
