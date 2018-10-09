@@ -71,7 +71,6 @@ const updateTodo = (req, res, next) => {
   const updateSQL = toSet => `UPDATE todos SET ${toSet} WHERE id = ?`;
   const selectSQL = 'SELECT * FROM todos WHERE id = ?';
   const updateStmt = mysql.format(updateSQL(setValue), [id]);
-  console.log(updateStmt);
   const selectStmt = mysql.format(selectSQL, [id]);
   pool.getConnection((err, connection) => {
     if (err) {
@@ -109,14 +108,13 @@ const deleteTodo = (req, res, next) => {
         handleSQLError(err, connection, next);
         return;
       }
-      connection.query(selectStmt, (err, result, fields) => {
-        if (err) {
-          handleSQLError(err, connection, next);
-          return;
-        }
-        res.status(STATUS_CODE.SUCCESS).json(result);
-        connection.release();
-      });
+      const { affectedRows } = results;
+      if (affectedRows) {
+        res.sendStatus(STATUS_CODE.SUCCESS);
+      } else {
+        res.sendStatus(STATUS_CODE.NOT_FOUND);
+      }
+      connection.release();
     });
   });
 };
