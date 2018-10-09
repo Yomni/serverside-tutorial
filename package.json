@@ -18,7 +18,10 @@
     "winston-daily-rotate-file": "^3.3.3"
   },
   "scripts": {
-    "start:dev": "NODE_ENV=dev pm2 start src/server.js",
-    "start:prod": "NODE_ENV=production pm2 start src/server.js"
+    "start:dev": "pm2 start ecosystem.config.js",
+    "start:prod": "pm2 start ecosystem.config.js --env production",
+    "ps": "pm2 list",
+    "restart": "pm2 restart all",
+    "shutdown": "pm2 stop all && pm2 kill"
   }
 }
